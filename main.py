@@ -7,6 +7,7 @@
 
 import os
 import configparser
+import time
 from CDTB.cdragontoolbox.wad import Wad
 from CDTB.cdragontoolbox.hashes import default_hashfile
 
@@ -32,6 +33,7 @@ OUTER = config.get("extract", "output_path")
 # RExtractorConsole CLI
 EXTRA_EXE = config.get("extract", "recli")
 
+TIME=config.get("extract","last_time")
 # 取出中文语音并派出SG开头文件
 file_list = [item for item in os.listdir(PATH) if item.lower().find("zh_cn") > 0 ]
 
@@ -39,7 +41,7 @@ file_list = [item for item in os.listdir(PATH) if item.lower().find("zh_cn") > 0
 champions = list()
 
 ################## 第一步解包WAD ##################
-
+#
 # 遍历语音文件
 for item in file_list:
     # 取出英雄名字
@@ -48,18 +50,19 @@ for item in file_list:
     item_outer = os.path.join(OUTER, champion_name)
     # 拼接语音wad文件位置
     item_path = os.path.join(PATH, item)
-    print(champion_name)
-    # 加入英雄名字列表
-    champions.append(champion_name)
-    # wad文件解包
-    try:
-        wad_extract(item_path, item_outer)
-    except:
-        print("出错")
+    if int(time.strftime("%Y%m%d",time.localtime(os.stat(item_path).st_mtime)))>int(TIME):
+        print(champion_name)
+        # 加入英雄名字列表
+        champions.append(champion_name)
+        # wad文件解包
+        try:
+            wad_extract(item_path, item_outer)
+        except:
+            print("出错")
 
-
-################## 第二步解包WPK ##################
-
+#
+# ################## 第二步解包WPK ##################
+#
 # 遍历英雄名字
 for item in champions:
     # if len(os.listdir("D:/英雄联盟/原始包2019-10-13/"+item))>0:
@@ -77,7 +80,7 @@ for item in champions:
                 # 用RExtractor解包
                 os.system('%s %s %s /soundformat:wav' % (EXTRA_EXE, os.path.join(skin_path, item_wpk), os.path.join(OUTER, item, skin_item)))
 
-#
+
 # 删除assets目录 也就是wpk bnk文件目录，因为用不到了
 for item in champions:
     temp_path = os.path.join(OUTER, item, 'assets')
