@@ -177,8 +177,8 @@ class TftTransformer:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("input", help="directory with extracted bin files")
-    parser.add_argument("-o", "--output", default="tft", help="output directory")
+    parser.add_argument("input", help="H:/英雄联盟/原始包2019-9-26")
+    parser.add_argument("-o", "--output", default="tft", help="H:/英雄联盟/原始包2019-9-26")
     args = parser.parse_args()
 
     font_folder = os.path.join(args.input, "data", "menu")
