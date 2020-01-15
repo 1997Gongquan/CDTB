@@ -28,6 +28,9 @@ config.read('.\config.ini', encoding="utf-8")
 
 # 语音文件位置
 PATH = os.path.join(config.get("extract", "game_path"), r'')
+# for i in os.listdir(PATH):
+#     if "zh_CN" not in i:
+#         os.remove(PATH+"/"+i)
 # 输出目录
 OUTER = config.get("extract", "output_path")
 # RExtractorConsole CLI
@@ -35,11 +38,10 @@ EXTRA_EXE = config.get("extract", "recli")
 
 TIME=config.get("extract","last_time")
 # 取出中文语音并派出SG开头文件
-file_list = [item for item in os.listdir(PATH) if item.lower().find("zh_cn") > 0 ]
+file_list = [item for item in os.listdir(PATH)]
 
 # 英雄列表初始化
 champions = list()
-
 ################## 第一步解包WAD ##################
 #
 # 遍历语音文件
@@ -57,29 +59,29 @@ for item in file_list:
         # wad文件解包
         try:
             wad_extract(item_path, item_outer)
+            pass
         except:
             print("出错")
-
 #
 # ################## 第二步解包WPK ##################
 #
 # 遍历英雄名字
 for item in champions:
-    # if len(os.listdir("D:/英雄联盟/原始包2019-10-13/"+item))>0:
+    # if len(os.listdir(OUTER+"/"+item))==1:
     if len(os.listdir(OUTER+"/"+item))>0:
         # 拼接皮肤目录
         skin_paths = os.path.join(OUTER, item, r'assets\sounds\wwise2016\vo\zh_cn\characters\%s\skins' % item.lower())
-
         # 遍历皮肤目录 base 、 skin01 、 skin02 等等
-        for skin_item in os.listdir(skin_paths):
-            # 拼接皮肤目录
-            skin_path = os.path.join(skin_paths, skin_item)
-
-            # 遍历文件并只取出wpk文件
-            for item_wpk in [i for i in os.listdir(os.path.join(skin_path)) if i.split('.')[-1] == 'wpk']:
-                # 用RExtractor解包
-                os.system('%s %s %s /soundformat:wav' % (EXTRA_EXE, os.path.join(skin_path, item_wpk), os.path.join(OUTER, item, skin_item)))
-
+        try:
+            for skin_item in os.listdir(skin_paths):
+                # 拼接皮肤目录
+                skin_path = os.path.join(skin_paths, skin_item)
+                # 遍历文件并只取出wpk文件
+                for item_wpk in [i for i in os.listdir(os.path.join(skin_path)) if i.split('.')[-1] == 'wpk']:
+                    # 用RExtractor解包
+                    os.system('%s %s %s /soundformat:wav' % (EXTRA_EXE, os.path.join(skin_path, item_wpk), os.path.join(OUTER, item, skin_item)))
+        except:
+            print(skin_paths+"打开失败")
 
 # 删除assets目录 也就是wpk bnk文件目录，因为用不到了
 for item in champions:
